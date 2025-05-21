@@ -11,6 +11,7 @@ async function build() {
     platform: 'node',
     target: 'node16',
     format: 'cjs',
+    packages: 'external',
   })
 }
 build().catch((error) => {
