@@ -1,0 +1,10 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "author": "Francisco Damião Terto <francisco.damiao.dev@gmail.com>",
+  "license": "MIT",
+  "packageManager": "pnpm@10.11.0",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
