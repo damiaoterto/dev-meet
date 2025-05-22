@@ -20,5 +20,5 @@
       "@infra/*": ["./infra/*"]
     }
   },
-  "exclude": ["dist", "esbuild.mjs"]
+  "exclude": ["dist", "esbuild.mjs", "vitest.config.ts"]
 }
