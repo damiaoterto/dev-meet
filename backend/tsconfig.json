@@ -14,7 +14,13 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "paths": {
+      "@adapters/*": ["./src/adapters/*"],
+      "@core/*": ["./src/core/*"],
+      "@domain/*": ["./src/domain/*"],
+      "@di/*": ["./src/di/*"]
+    }
   },
   "exclude": ["dist", "esbuild.mjs"]
 }

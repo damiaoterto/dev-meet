@@ -1,5 +1,6 @@
 import { exit } from 'node:process'
 import esbuild from 'esbuild'
+import tsPaths from 'esbuild-ts-paths'
 
 async function build() {
   await esbuild.build({
@@ -12,6 +13,7 @@ async function build() {
     target: 'node16',
     format: 'cjs',
     packages: 'external',
+    plugins: [tsPaths()],
   })
 }
 build().catch((error) => {
