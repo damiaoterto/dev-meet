@@ -9,10 +9,12 @@
     "build": "node esbuild.mjs",
     "dev": "ts-node-dev -r tsconfig-paths/register -r dotenv/config --respawn --transpile-only ./src/main.ts",
     "debug": "ts-node-dev -r tsconfig-paths/register -r dotenv/config --respawn --inspect --transpile-only ./src/main.ts",
+    "format": "biome format --write ./src/**/*.ts",
     "start": "node -r dotenv/config main.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
+    "@biomejs/biome": "1.9.4",
     "@types/node": "^22.15.21",
     "esbuild": "^0.25.4",
     "esbuild-ts-paths": "^1.1.3",
