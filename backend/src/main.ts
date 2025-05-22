@@ -1,4 +1,8 @@
+import { DevMeet } from './dev-meet'
+
 async function main() {
-	// TODO: main function implementation
+	const app = DevMeet.createApp()
+	app.enableGracefulShutdown()
+	await app.listen()
 }
 main()
