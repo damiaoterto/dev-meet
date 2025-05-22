@@ -16,10 +16,8 @@
     "strict": true,
     "skipLibCheck": true,
     "paths": {
-      "@adapters/*": ["./src/adapters/*"],
       "@core/*": ["./src/core/*"],
-      "@domain/*": ["./src/domain/*"],
-      "@di/*": ["./src/di/*"]
+      "@infra/*": ["./infra/*"]
     }
   },
   "exclude": ["dist", "esbuild.mjs"]
