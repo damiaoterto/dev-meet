@@ -16,7 +16,8 @@
     "strict": true,
     "skipLibCheck": true,
     "paths": {
-      "@core/*": ["./src/core/*"],
+      "@domain/*": ["./src/domain/*"],
+      "@shared/*": ["./src/shared/*"],
       "@infra/*": ["./infra/*"]
     }
   },
