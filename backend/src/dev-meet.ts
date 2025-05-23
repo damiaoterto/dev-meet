@@ -1,7 +1,6 @@
 import 'reflect-metadata'
 
 import { exit } from 'node:process'
-import { setTimeout as sleep } from 'node:timers/promises'
 import { ProcessExit } from '@core/shared/enums/process-exit.enum'
 
 type ListenPorts = {
@@ -39,6 +38,8 @@ export class DevMeet {
 	async listen(ports?: ListenPorts): Promise<void> {
 		const httpPort = ports?.http || 3000
 		const peerPort = ports?.peer || 9000
+
+		console.log({ httpPort, peerPort })
 
 		console.log(`Http service listen on port ${httpPort}`)
 		console.log(`Peer service listen on port ${peerPort}`)
