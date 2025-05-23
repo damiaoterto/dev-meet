@@ -14,8 +14,10 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
+    "strictPropertyInitialization": false,
     "skipLibCheck": true,
     "paths": {
+      "@adapter/*": ["./src/adapter/*"],
       "@core/*": ["./src/core/*"],
       "@domain/*": ["./src/domain/*"],
       "@infra/*": ["./infra/*"]

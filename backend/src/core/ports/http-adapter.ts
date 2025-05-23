@@ -8,4 +8,5 @@ export type RouterHandler<Request = unknown, Response = unknown> = (
 export interface HttpAdapter {
 	registerRouter(method: HttpMethod, path: string, handler: RouterHandler): void
 	listen(port: number): Promise<void>
+	close(): Promise<void>
 }
