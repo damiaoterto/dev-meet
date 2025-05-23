@@ -1,6 +1,7 @@
 import 'reflect-metadata'
 
 import { exit } from 'node:process'
+import { setTimeout as sleep } from 'node:timers/promises'
 import { ProcessExit } from '@core/shared/enums/process-exit.enum'
 
 type ListenPorts = {
@@ -9,13 +10,28 @@ type ListenPorts = {
 }
 
 export class DevMeet {
-	enableGracefulShutdown() {
+	enableGracefulShutdown(timeout = 6000) {
 		const signals: NodeJS.Signals[] = ['SIGTERM', 'SIGINT']
 
 		for (const signal of signals) {
-			process.on(signal, () => {
-				console.log(`Received signal ${signal}`)
-				exit(ProcessExit.SUCCESS)
+			process.on(signal, async () => {
+				console.log(`Received signal ${signal}, init graceful shutdown`)
+
+				const timer = setTimeout(() => {
+					console.error('Time limit exceeded, forcing shutdown')
+					exit(ProcessExit.ERROR)
+				}, timeout)
+
+				try {
+					// TODO: implement services shutdown
+					console.log('Shutdown completed successfully')
+					exit(ProcessExit.SUCCESS)
+				} catch (error) {
+					console.log('Error on shutdown:', error)
+					exit(ProcessExit.ERROR)
+				} finally {
+					clearTimeout(timer)
+				}
 			})
 		}
 	}
