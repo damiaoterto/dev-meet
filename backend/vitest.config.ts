@@ -10,5 +10,6 @@ export default defineConfig({
 			provider: 'v8',
 			reporter: ['text', 'lcov', 'html', 'json'],
 		},
+		setupFiles: ['./test/setups/reflect-metadata.ts'],
 	},
 })
