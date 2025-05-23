@@ -17,12 +17,14 @@
     "test:ui": "vitest --ui"
   },
   "dependencies": {
+    "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "reflect-metadata": "^0.2.2"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
+    "@types/cors": "^2.8.18",
     "@types/express": "^5.0.2",
     "@types/node": "^22.15.21",
     "@types/supertest": "^6.0.3",
