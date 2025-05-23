@@ -4,10 +4,11 @@ import type { HttpMethod } from '@core/shared/enums/http/http-methods'
 import { json } from 'body-parser'
 import cors from 'cors'
 import express, { type Application, type Request, type Response } from 'express'
+import helmet from 'helmet'
 
 export class ExpressAdapter implements HttpAdapter {
 	public readonly app: Application
-	private readonly server: Server
+	public readonly server: Server
 
 	constructor() {
 		this.app = express()
@@ -19,6 +20,7 @@ export class ExpressAdapter implements HttpAdapter {
 	private setupDefaultMiddlewares() {
 		this.app.use(cors())
 		this.app.use(json())
+		this.app.use(helmet())
 	}
 
 	registerRouter(
