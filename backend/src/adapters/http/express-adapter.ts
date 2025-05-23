@@ -1,6 +1,7 @@
 import { type Server, createServer } from 'node:http'
 import type { HttpAdapter, RouterHandler } from '@core/ports/http-adapter'
 import type { HttpMethod } from '@core/shared/enums/http/http-methods'
+import { json } from 'body-parser'
 import cors from 'cors'
 import express, { type Application, type Request, type Response } from 'express'
 
@@ -17,6 +18,7 @@ export class ExpressAdapter implements HttpAdapter {
 
 	private setupDefaultMiddlewares() {
 		this.app.use(cors())
+		this.app.use(json())
 	}
 
 	registerRouter(
