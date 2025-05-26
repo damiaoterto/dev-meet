@@ -56,7 +56,7 @@ export class DevMeet {
 		console.log(`Http service listen on port ${httpPort}`)
 		console.log(`Peer service listen on port ${peerPort}`)
 
-		this.httpAdapter.listen(httpPort)
+		await this.httpAdapter.listen(httpPort)
 	}
 
 	static createApp() {

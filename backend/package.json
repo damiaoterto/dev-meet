@@ -7,10 +7,10 @@
   "scripts": {
     "prebuild": "rimraf dist/",
     "build": "node esbuild.mjs",
-    "dev": "ts-node-dev -r tsconfig-paths/register -r dotenv/config --respawn --transpile-only ./src/main.ts",
-    "debug": "ts-node-dev -r tsconfig-paths/register -r dotenv/config --respawn --inspect --transpile-only ./src/main.ts",
+    "dev": "ts-node-dev -r reflect-metadata -r tsconfig-paths/register -r dotenv/config --respawn --transpile-only ./src/main.ts",
+    "debug": "ts-node-dev -r reflect-metadata -r tsconfig-paths/register -r dotenv/config --respawn --inspect --transpile-only ./src/main.ts",
     "format": "biome format --write ./**/*.ts",
-    "start": "node -r dotenv/config dist/main.js",
+    "start": "node -r reflect-metadata -r dotenv/config dist/main.js",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:cov": "vitest run --coverage",
