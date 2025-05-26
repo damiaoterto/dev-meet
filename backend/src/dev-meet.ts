@@ -1,14 +1,28 @@
 import 'reflect-metadata'
 
 import { exit } from 'node:process'
+import type { HttpAdapter } from '@core/ports/http-adapter'
 import { ProcessExit } from '@core/shared/enums/process-exit.enum'
+import { ExpressAdapter } from './adapters/http/express-adapter'
 
 type ListenPorts = {
 	http?: number
 	peer?: number
 }
 
+interface DevMeetOptions {
+	adapter?: HttpAdapter
+}
+
 export class DevMeet {
+	private readonly httpAdapter: HttpAdapter
+
+	constructor(options?: DevMeetOptions) {
+		this.httpAdapter = !options?.adapter
+			? new ExpressAdapter()
+			: options?.adapter
+	}
+
 	enableGracefulShutdown(timeout = 6000) {
 		const signals: NodeJS.Signals[] = ['SIGTERM', 'SIGINT']
 
@@ -22,7 +36,7 @@ export class DevMeet {
 				}, timeout)
 
 				try {
-					// TODO: implement services shutdown
+					await this.httpAdapter.close()
 					console.log('Shutdown completed successfully')
 					exit(ProcessExit.SUCCESS)
 				} catch (error) {
@@ -39,12 +53,10 @@ export class DevMeet {
 		const httpPort = ports?.http || 3000
 		const peerPort = ports?.peer || 9000
 
-		console.log({ httpPort, peerPort })
-
 		console.log(`Http service listen on port ${httpPort}`)
 		console.log(`Peer service listen on port ${peerPort}`)
 
-		// TODO: listen implementation
+		this.httpAdapter.listen(httpPort)
 	}
 
 	static createApp() {
