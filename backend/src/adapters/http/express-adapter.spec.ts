@@ -16,7 +16,7 @@ describe('ExpressAdapter', () => {
 		}
 
 		adapter.registerRouter(HttpMethod.GET, '/ping', handler)
-		adapter.listen(3000)
+		adapter.listen(9000)
 	})
 
 	afterEach(async () => {
@@ -28,7 +28,7 @@ describe('ExpressAdapter', () => {
 	})
 
 	it('should start the server and handle requests on the specified port', async () => {
-		const response = await fetch('http://localhost:3000/ping', {
+		const response = await fetch('http://localhost:9000/ping', {
 			method: 'GET',
 		})
 		const responseText = await response.text()

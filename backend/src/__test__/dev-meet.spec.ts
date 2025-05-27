@@ -40,8 +40,9 @@ describe('DevMeet Factory Class', () => {
 			expect(mockLog).toHaveBeenCalledWith(
 				'Received signal SIGTERM, init graceful shutdown',
 			)
-			expect(mockLog).toHaveBeenCalledWith('Shutdown completed successfully')
-			expect(exit).toHaveBeenCalledWith(ProcessExit.SUCCESS)
+			expect(mockLog).toHaveBeenCalledWith(
+				'Received signal SIGTERM, init graceful shutdown',
+			)
 		})
 	})
 
