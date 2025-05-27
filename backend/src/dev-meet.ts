@@ -1,11 +1,11 @@
 import 'reflect-metadata'
 
 import { exit } from 'node:process'
+import { ExpressAdapter } from '@adapters/http/express-adapter'
+import { SocketIoAdapter } from '@adapters/ws/socket-io-adapter'
 import type { HttpAdapter } from '@core/ports/http-adapter'
 import type { WebSocketAdapter } from '@core/ports/web-socket-adapter'
 import { ProcessExit } from '@core/shared/enums/process-exit.enum'
-import { ExpressAdapter } from './adapters/http/express-adapter'
-import { SocketIoAdapter } from './adapters/ws/socket-io-adapter'
 
 type ListenPorts = {
 	http?: number

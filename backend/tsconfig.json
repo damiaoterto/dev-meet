@@ -17,7 +17,7 @@
     "strictPropertyInitialization": false,
     "skipLibCheck": true,
     "paths": {
-      "@adapter/*": ["./src/adapter/*"],
+      "@adapters/*": ["./src/adapters/*"],
       "@core/*": ["./src/core/*"],
       "@domain/*": ["./src/domain/*"],
       "@infra/*": ["./infra/*"]
