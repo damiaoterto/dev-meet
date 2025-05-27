@@ -1,3 +1,4 @@
+import type { Server } from 'node:http'
 import type { HttpMethod } from '@core/shared/enums/http/http-methods'
 
 export type RouterHandler<Request = unknown, Response = unknown> = (
@@ -8,5 +9,6 @@ export type RouterHandler<Request = unknown, Response = unknown> = (
 export interface HttpAdapter {
 	registerRouter(method: HttpMethod, path: string, handler: RouterHandler): void
 	listen(port: number): Promise<void>
+	getHttpServer(): Server
 	close(): Promise<void>
 }

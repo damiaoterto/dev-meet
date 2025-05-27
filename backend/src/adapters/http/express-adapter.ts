@@ -17,6 +17,10 @@ export class ExpressAdapter implements HttpAdapter {
 		this.setupDefaultMiddlewares()
 	}
 
+	getHttpServer(): Server {
+		return this.server
+	}
+
 	private setupDefaultMiddlewares() {
 		this.app.use(cors())
 		this.app.use(json())

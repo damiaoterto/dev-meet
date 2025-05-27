@@ -2,8 +2,10 @@ import 'reflect-metadata'
 
 import { exit } from 'node:process'
 import type { HttpAdapter } from '@core/ports/http-adapter'
+import type { WebSocketAdapter } from '@core/ports/web-socket-adapter'
 import { ProcessExit } from '@core/shared/enums/process-exit.enum'
 import { ExpressAdapter } from './adapters/http/express-adapter'
+import { SocketIoAdapter } from './adapters/ws/socket-io-adapter'
 
 type ListenPorts = {
 	http?: number
@@ -11,16 +13,22 @@ type ListenPorts = {
 }
 
 interface DevMeetOptions {
-	adapter?: HttpAdapter
+	httpAdapter?: HttpAdapter
+	ioAdapter?: WebSocketAdapter
 }
 
 export class DevMeet {
 	private readonly httpAdapter: HttpAdapter
+	private readonly ioAdapter: WebSocketAdapter
 
 	constructor(options?: DevMeetOptions) {
-		this.httpAdapter = !options?.adapter
+		this.httpAdapter = !options?.httpAdapter
 			? new ExpressAdapter()
-			: options?.adapter
+			: options?.httpAdapter
+
+		this.ioAdapter = !options?.ioAdapter
+			? new SocketIoAdapter(this.httpAdapter.getHttpServer())
+			: options.ioAdapter
 	}
 
 	enableGracefulShutdown(timeout = 6000) {

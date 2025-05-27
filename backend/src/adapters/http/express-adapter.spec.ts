@@ -1,3 +1,4 @@
+import { Server } from 'node:http'
 import { HttpMethod } from '@core/shared/enums/http/http-methods'
 import type { Request, Response } from 'express'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
@@ -49,5 +50,10 @@ describe('ExpressAdapter', () => {
 			expect(error).instanceOf(Error)
 			expect((error as Error).message).toBe('Server is not running.')
 		}
+	})
+
+	it('should return node:http Server instance', () => {
+		expect(adapter.getHttpServer()).toBeDefined()
+		expect(adapter.getHttpServer()).toBeInstanceOf(Server)
 	})
 })
