@@ -1,3 +1,4 @@
+import 'reflect-metadata'
 import { DevMeet } from './dev-meet'
 
 async function main() {

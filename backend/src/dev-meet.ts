@@ -1,5 +1,3 @@
-import 'reflect-metadata'
-
 import { exit } from 'node:process'
 import { ExpressAdapter } from '@adapters/http/express-adapter'
 import { SocketIoAdapter } from '@adapters/ws/socket-io-adapter'
