@@ -4,6 +4,7 @@ import { defineConfig } from 'vitest/config'
 export default defineConfig({
 	test: {
 		alias: {
+			'@adapters': resolve(__dirname, 'src', 'adapters'),
 			'@core': resolve(__dirname, 'src', 'core'),
 		},
 		coverage: {
