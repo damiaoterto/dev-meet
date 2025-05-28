@@ -19,13 +19,13 @@ type ListenPorts = {
 interface DevMeetOptions {
 	httpAdapter?: HttpAdapter
 	wsAdapter?: WebSocketAdapter
-	peerAdapter?: WebRTCAdapter
+	webRTCAdapter?: WebRTCAdapter
 }
 
 export class DevMeet {
 	private readonly httpAdapter: HttpAdapter
 	private readonly wsAdapter: WebSocketAdapter
-	private peerAdapter: WebRTCAdapter
+	private webRTCAdapter: WebRTCAdapter
 	private options?: DevMeetOptions
 
 	constructor(module: AppModule, options?: DevMeetOptions) {
@@ -65,15 +65,15 @@ export class DevMeet {
 	}
 
 	private listenPeerEvents(port: number, path = '/peer') {
-		if (!this.options?.peerAdapter) {
-			this.peerAdapter = new PeerAdapter(port, path)
+		if (!this.options?.webRTCAdapter) {
+			this.webRTCAdapter = new PeerAdapter(port, path)
 		}
 
-		this.peerAdapter.onConnection(async (client) => {
+		this.webRTCAdapter.onConnection(async (client) => {
 			// TODO: peer events handler implementation here
 		})
 
-		this.peerAdapter.onError(async (error) => {
+		this.webRTCAdapter.onError(async (error) => {
 			console.error(error)
 		})
 	}
