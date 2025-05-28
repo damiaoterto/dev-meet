@@ -1,11 +1,11 @@
+import type { RouterHandler } from '@core/ports/http-adapter'
 import { HttpMethod } from '@core/shared/enums/http/http-methods'
 import { METHOD_METADATA, PATH_METADATA } from '../constants'
 
 export interface Route {
 	method: string
 	path: string
-	// biome-ignore lint/complexity/noBannedTypes: <explanation>
-	handler: Function
+	handler: RouterHandler
 }
 
 export function Get(path: string): MethodDecorator {

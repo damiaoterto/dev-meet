@@ -3,12 +3,11 @@ import { ExpressAdapter } from '@adapters/http/express-adapter'
 import { PeerAdapter } from '@adapters/web-rtc/peer-adapter'
 import { SocketIoAdapter } from '@adapters/ws/socket-io-adapter'
 import { getRouterInfo } from '@core/decorators/http/method.decorator'
-import type { HttpAdapter, RouterHandler } from '@core/ports/http-adapter'
+import type { HttpAdapter } from '@core/ports/http-adapter'
 import type { WebRTCAdapter } from '@core/ports/web-rtc-adapter'
 import type { WebSocketAdapter } from '@core/ports/web-socket-adapter'
 import type { HttpMethod } from '@core/shared/enums/http/http-methods'
 import { ProcessExit } from '@core/shared/enums/process-exit.enum'
-import { IClient } from 'peer'
 import type { Socket } from 'socket.io'
 import type { AppModule } from './app-module'
 
@@ -27,8 +26,10 @@ export class DevMeet {
 	private readonly httpAdapter: HttpAdapter
 	private readonly wsAdapter: WebSocketAdapter
 	private peerAdapter: WebRTCAdapter
+	private options?: DevMeetOptions
 
 	constructor(module: AppModule, options?: DevMeetOptions) {
+		this.options = options
 		this.httpAdapter = !options?.httpAdapter
 			? new ExpressAdapter()
 			: options?.httpAdapter
@@ -38,7 +39,6 @@ export class DevMeet {
 			: options.wsAdapter
 
 		this.registerRoutes(module)
-		this.listenWsEvents()
 	}
 
 	registerRoutes(module: AppModule) {
@@ -52,7 +52,7 @@ export class DevMeet {
 				this.httpAdapter.registerRouter(
 					route.method as HttpMethod,
 					route.path,
-					route.handler as RouterHandler,
+					route.handler,
 				)
 			}
 		}
@@ -64,9 +64,17 @@ export class DevMeet {
 		})
 	}
 
-	private listenPeerEvents() {
+	private listenPeerEvents(port: number, path = '/peer') {
+		if (!this.options?.peerAdapter) {
+			this.peerAdapter = new PeerAdapter(port, path)
+		}
+
 		this.peerAdapter.onConnection(async (client) => {
 			// TODO: peer events handler implementation here
+		})
+
+		this.peerAdapter.onError(async (error) => {
+			console.error(error)
 		})
 	}
 
@@ -101,6 +109,9 @@ export class DevMeet {
 		const httpPort = ports?.http || 3000
 		const peerPort = ports?.peer || 9000
 
+		this.listenPeerEvents(peerPort)
+		this.listenWsEvents()
+
 		console.log(`Http service listen on port ${httpPort}`)
 		console.log(`Peer service listen on port ${peerPort}`)
 
@@ -109,6 +120,5 @@ export class DevMeet {
 
 	static createApp(module: AppModule, options?: DevMeetOptions) {
 		return new DevMeet(module, options)
-		// TODO: implement
 	}
 }
