@@ -22,10 +22,7 @@ const createMockIoServer = () => {
 	}
 }
 
-const mockIoServer = {
-	on: vi.fn(),
-	close: vi.fn((cb) => cb()),
-}
+const mockIoServer = createMockIoServer()
 
 vi.mock('socket.io', () => ({
 	Server: vi.fn(() => mockIoServer),
@@ -33,17 +30,51 @@ vi.mock('socket.io', () => ({
 
 describe('SocketIO Adapter', () => {
 	let mockHttpServer: Server
-	let mockIoServer: ReturnType<typeof createMockIoServer>
 	let adapter: SocketIoAdapter
 
 	beforeEach(() => {
 		mockHttpServer = {} as Server
-		mockIoServer = createMockIoServer()
-
 		adapter = new SocketIoAdapter(mockHttpServer)
+	})
+
+	afterEach(() => {
+		vi.clearAllMocks()
 	})
 
 	it('should be defined', () => {
 		expect(adapter).toBeDefined()
+	})
+
+	it('should call the connection callback when a connection event occurs', async () => {
+		const mockSocket = createMockSocket()
+		const connectionCallback = vi.fn()
+
+		adapter.onConnection(connectionCallback)
+
+		const connectionHandler = mockIoServer.on.mock.calls.find(
+			(call) => call[0] === 'connection',
+		)?.[1]
+
+		if (connectionHandler) {
+			await connectionHandler(mockSocket)
+		} else {
+			throw new Error('Connection handler not registered')
+		}
+
+		expect(connectionCallback).toHaveBeenCalledWith(mockSocket)
+	})
+
+	it('should close the socket.io server without errors', async () => {
+		await expect(adapter.close()).resolves.not.toThrow()
+		expect(mockIoServer.close).toHaveBeenCalled()
+	})
+
+	it('should reject with an error when closing the socket.io server fails', async () => {
+		const mockError = new Error('Failed to close server')
+		mockIoServer.close.mockImplementationOnce((cb) => cb(mockError))
+
+		await expect(adapter.close()).rejects.toThrow(mockError)
+
+		expect(mockIoServer.close).toHaveBeenCalled()
 	})
 })
