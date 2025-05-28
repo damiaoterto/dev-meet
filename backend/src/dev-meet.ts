@@ -4,6 +4,7 @@ import { SocketIoAdapter } from '@adapters/ws/socket-io-adapter'
 import type { HttpAdapter } from '@core/ports/http-adapter'
 import type { WebSocketAdapter } from '@core/ports/web-socket-adapter'
 import { ProcessExit } from '@core/shared/enums/process-exit.enum'
+import type { Socket } from 'socket.io'
 
 type ListenPorts = {
 	http?: number
@@ -12,24 +13,32 @@ type ListenPorts = {
 
 interface DevMeetOptions {
 	httpAdapter?: HttpAdapter
-	ioAdapter?: WebSocketAdapter
+	wsAdapter?: WebSocketAdapter
 }
 
 export class DevMeet {
 	private readonly httpAdapter: HttpAdapter
-	private readonly ioAdapter: WebSocketAdapter
+	private readonly wsAdapter: WebSocketAdapter
 
 	constructor(options?: DevMeetOptions) {
 		this.httpAdapter = !options?.httpAdapter
 			? new ExpressAdapter()
 			: options?.httpAdapter
 
-		this.ioAdapter = !options?.ioAdapter
+		this.wsAdapter = !options?.wsAdapter
 			? new SocketIoAdapter(this.httpAdapter.getHttpServer())
-			: options.ioAdapter
+			: options.wsAdapter
+
+		this.listenWsEvents()
 	}
 
-	enableGracefulShutdown(timeout = 6000) {
+	private listenWsEvents() {
+		this.wsAdapter.onConnection(async (socket: Socket) => {
+			// TODO: events handler implementation here
+		})
+	}
+
+	enableGracefulShutdown(timeout = 5000) {
 		const signals: NodeJS.Signals[] = ['SIGTERM', 'SIGINT']
 
 		for (const signal of signals) {
@@ -42,6 +51,7 @@ export class DevMeet {
 				}, timeout)
 
 				try {
+					await this.wsAdapter.close()
 					await this.httpAdapter.close()
 					console.log('Shutdown completed successfully')
 					exit(ProcessExit.SUCCESS)

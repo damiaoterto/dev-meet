@@ -14,11 +14,11 @@ const createMockSocket = (): MockSocket => ({
 
 const createMockIoServer = () => {
 	const mockOn = vi.fn()
-	const mockClose = vi.fn((cb) => cb())
+	const mockClose = vi.fn()
 
 	return {
 		on: mockOn,
-		close: mockClose,
+		disconnectSockets: mockClose,
 	}
 }
 
@@ -66,15 +66,6 @@ describe('SocketIO Adapter', () => {
 
 	it('should close the socket.io server without errors', async () => {
 		await expect(adapter.close()).resolves.not.toThrow()
-		expect(mockIoServer.close).toHaveBeenCalled()
-	})
-
-	it('should reject with an error when closing the socket.io server fails', async () => {
-		const mockError = new Error('Failed to close server')
-		mockIoServer.close.mockImplementationOnce((cb) => cb(mockError))
-
-		await expect(adapter.close()).rejects.toThrow(mockError)
-
-		expect(mockIoServer.close).toHaveBeenCalled()
+		expect(mockIoServer.disconnectSockets).toHaveBeenCalled()
 	})
 })

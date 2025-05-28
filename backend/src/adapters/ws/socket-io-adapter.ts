@@ -19,11 +19,9 @@ export class SocketIoAdapter implements WebSocketAdapter {
 	}
 
 	async close(): Promise<void> {
-		return new Promise((resolve, reject) => {
-			this.io.close((err) => {
-				if (err) reject(err)
-				resolve()
-			})
+		return new Promise((resolve) => {
+			this.io.disconnectSockets(true)
+			resolve()
 		})
 	}
 }
