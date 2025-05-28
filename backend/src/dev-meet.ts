@@ -1,10 +1,13 @@
 import { exit } from 'node:process'
 import { ExpressAdapter } from '@adapters/http/express-adapter'
 import { SocketIoAdapter } from '@adapters/ws/socket-io-adapter'
-import type { HttpAdapter } from '@core/ports/http-adapter'
+import { getRouterInfo } from '@core/decorators/http/method.decorator'
+import type { HttpAdapter, RouterHandler } from '@core/ports/http-adapter'
 import type { WebSocketAdapter } from '@core/ports/web-socket-adapter'
+import type { HttpMethod } from '@core/shared/enums/http/http-methods'
 import { ProcessExit } from '@core/shared/enums/process-exit.enum'
 import type { Socket } from 'socket.io'
+import type { AppModule } from './app-module'
 
 type ListenPorts = {
 	http?: number
@@ -20,7 +23,7 @@ export class DevMeet {
 	private readonly httpAdapter: HttpAdapter
 	private readonly wsAdapter: WebSocketAdapter
 
-	constructor(options?: DevMeetOptions) {
+	constructor(module: AppModule, options?: DevMeetOptions) {
 		this.httpAdapter = !options?.httpAdapter
 			? new ExpressAdapter()
 			: options?.httpAdapter
@@ -29,7 +32,25 @@ export class DevMeet {
 			? new SocketIoAdapter(this.httpAdapter.getHttpServer())
 			: options.wsAdapter
 
+		this.registerRoutes(module)
 		this.listenWsEvents()
+	}
+
+	registerRoutes(module: AppModule) {
+		const controllers = module.getAllControllers()
+
+		for (const controller of controllers) {
+			const instance = new controller()
+			const routes = getRouterInfo(instance)
+
+			for (const route of routes) {
+				this.httpAdapter.registerRouter(
+					route.method as HttpMethod,
+					route.path,
+					route.handler as RouterHandler,
+				)
+			}
+		}
 	}
 
 	private listenWsEvents() {
@@ -75,8 +96,8 @@ export class DevMeet {
 		await this.httpAdapter.listen(httpPort)
 	}
 
-	static createApp() {
-		return new DevMeet()
+	static createApp(module: AppModule, options?: DevMeetOptions) {
+		return new DevMeet(module, options)
 		// TODO: implement
 	}
 }

@@ -48,7 +48,7 @@ export function getRouterInfo(controller: any): Route[] {
 		if (methodPath && methodType) {
 			routes.push({
 				method: methodType,
-				path: `${basePath}${methodPath}`,
+				path: `/${basePath}${methodPath}`.replace(/\/+/g, '/'),
 				handler: prototype[methodName],
 			})
 		}

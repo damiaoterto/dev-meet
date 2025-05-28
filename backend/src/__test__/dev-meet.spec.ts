@@ -15,8 +15,11 @@ vi.mock('node:process', async () => {
 })
 
 import { exit } from 'node:process'
+import { AppModule } from '../app-module'
 
 describe('DevMeet Factory Class', () => {
+	const appModule = new AppModule()
+
 	beforeAll(() => {
 		mockLog.mockClear()
 		mockError.mockClear()
@@ -31,7 +34,7 @@ describe('DevMeet Factory Class', () => {
 
 	describe('enableGracefulShutdown', () => {
 		it('should handle SIGTERM and SIGINT signals correctly', async () => {
-			const devMeet = new DevMeet()
+			const devMeet = new DevMeet(appModule)
 
 			devMeet.enableGracefulShutdown(500)
 
@@ -48,7 +51,7 @@ describe('DevMeet Factory Class', () => {
 
 	describe('listen', () => {
 		it('should use default ports if none are provided', async () => {
-			const devMeet = new DevMeet()
+			const devMeet = new DevMeet(appModule)
 
 			await devMeet.listen()
 
@@ -57,7 +60,7 @@ describe('DevMeet Factory Class', () => {
 		})
 
 		it('should use custom ports if provided', async () => {
-			const devMeet = new DevMeet()
+			const devMeet = new DevMeet(appModule)
 
 			await devMeet.listen({ http: 4000, peer: 9090 })
 
@@ -68,7 +71,7 @@ describe('DevMeet Factory Class', () => {
 
 	describe('createApp', () => {
 		it('should create an instance of DevMeet', () => {
-			const app = DevMeet.createApp()
+			const app = DevMeet.createApp(appModule)
 			expect(app).toBeDefined()
 		})
 	})

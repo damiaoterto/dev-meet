@@ -32,7 +32,24 @@ export class ExpressAdapter implements HttpAdapter {
 		path: string,
 		handler: RouterHandler<Request, Response>,
 	): void {
-		this.app[method](path, handler)
+		const validMethods = [
+			'get',
+			'post',
+			'put',
+			'delete',
+			'patch',
+			'options',
+			'head',
+		] as const
+
+		const httpMethod = method.toLowerCase()
+
+		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+		if (!validMethods.includes(httpMethod as any)) {
+			throw new Error(`Método HTTP inválido: ${method}`)
+		}
+
+		this.app[httpMethod as keyof typeof this.app](path, handler)
 	}
 
 	async listen(port: number): Promise<void> {
