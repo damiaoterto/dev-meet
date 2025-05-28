@@ -58,4 +58,23 @@ describe('PeerAdapter', () => {
 
 		expect(connectionCallback).toHaveBeenCalledWith(mockPeer)
 	})
+
+	it('should call the open callback when a connection event occurs', async () => {
+		const mockPeer = createMockSocket()
+		const connectionCallback = vi.fn()
+
+		adapter.onError(connectionCallback)
+
+		const connectionHandler = mockPeerServer.on.mock.calls.find(
+			(call) => call[0] === 'error',
+		)?.[1]
+
+		if (connectionHandler) {
+			await connectionHandler(mockPeer)
+		} else {
+			throw new Error('Connection handler not registered')
+		}
+
+		expect(connectionCallback).toHaveBeenCalledWith(mockPeer)
+	})
 })

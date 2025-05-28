@@ -1,11 +1,14 @@
 import { exit } from 'node:process'
 import { ExpressAdapter } from '@adapters/http/express-adapter'
+import { PeerAdapter } from '@adapters/web-rtc/peer-adapter'
 import { SocketIoAdapter } from '@adapters/ws/socket-io-adapter'
 import { getRouterInfo } from '@core/decorators/http/method.decorator'
 import type { HttpAdapter, RouterHandler } from '@core/ports/http-adapter'
+import type { WebRTCAdapter } from '@core/ports/web-rtc-adapter'
 import type { WebSocketAdapter } from '@core/ports/web-socket-adapter'
 import type { HttpMethod } from '@core/shared/enums/http/http-methods'
 import { ProcessExit } from '@core/shared/enums/process-exit.enum'
+import { IClient } from 'peer'
 import type { Socket } from 'socket.io'
 import type { AppModule } from './app-module'
 
@@ -17,11 +20,13 @@ type ListenPorts = {
 interface DevMeetOptions {
 	httpAdapter?: HttpAdapter
 	wsAdapter?: WebSocketAdapter
+	peerAdapter?: WebRTCAdapter
 }
 
 export class DevMeet {
 	private readonly httpAdapter: HttpAdapter
 	private readonly wsAdapter: WebSocketAdapter
+	private peerAdapter: WebRTCAdapter
 
 	constructor(module: AppModule, options?: DevMeetOptions) {
 		this.httpAdapter = !options?.httpAdapter
@@ -56,6 +61,12 @@ export class DevMeet {
 	private listenWsEvents() {
 		this.wsAdapter.onConnection(async (socket: Socket) => {
 			// TODO: events handler implementation here
+		})
+	}
+
+	private listenPeerEvents() {
+		this.peerAdapter.onConnection(async (client) => {
+			// TODO: peer events handler implementation here
 		})
 	}
 
