@@ -3,6 +3,7 @@ import { ExpressAdapter } from '@adapters/http/express-adapter'
 import { PeerAdapter } from '@adapters/web-rtc/peer-adapter'
 import { SocketIoAdapter } from '@adapters/ws/socket-io-adapter'
 import { getRouterInfo } from '@core/decorators/http/method.decorator'
+import { getOnConnectionEventFn } from '@core/decorators/web-socket/web-socket-events.decorator'
 import type { HttpAdapter } from '@core/ports/http-adapter'
 import type { WebRTCAdapter } from '@core/ports/web-rtc-adapter'
 import type { WebSocketAdapter } from '@core/ports/web-socket-adapter'
@@ -38,6 +39,7 @@ export class DevMeet {
 			? new SocketIoAdapter(this.httpAdapter.getHttpServer())
 			: options.wsAdapter
 
+		this.listenWsEvents(module)
 		this.registerRoutes(module)
 	}
 
@@ -58,9 +60,14 @@ export class DevMeet {
 		}
 	}
 
-	private listenWsEvents() {
+	private listenWsEvents(module: AppModule) {
+		const events = module.getAllEvents().map((event) => new event())
 		this.wsAdapter.onConnection(async (socket: Socket) => {
-			// TODO: events handler implementation here
+			for (const event of events) {
+				const fn = getOnConnectionEventFn(event)
+				if (!fn) continue
+				await fn(socket)
+			}
 		})
 	}
 
@@ -110,7 +117,6 @@ export class DevMeet {
 		const peerPort = ports?.peer || 9000
 
 		this.listenPeerEvents(peerPort)
-		this.listenWsEvents()
 
 		console.log(`Http service listen on port ${httpPort}`)
 		console.log(`Peer service listen on port ${peerPort}`)
