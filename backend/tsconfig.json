@@ -18,11 +18,10 @@
     "skipLibCheck": true,
     "paths": {
       "@application/*": ["./src/application/*"],
-      "@adapters/*": ["./src/adapters/*"],
       "@bootstrap/*": ["./src/bootstrap/*"],
       "@core/*": ["./src/core/*"],
       "@domain/*": ["./src/domain/*"],
-      "@infra/*": ["./infra/*"]
+      "@infrastructure/*": ["./src/infrastructure/*"]
     }
   },
   "exclude": ["./dist", "./coverage/**/*", "test/**/*.ts", "esbuild.mjs", "vitest.config.ts"]
