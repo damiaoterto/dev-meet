@@ -32,6 +32,9 @@ importers:
       socket.io:
         specifier: ^4.8.1
         version: 4.8.1
+      tsyringe:
+        specifier: ^4.10.0
+        version: 4.10.0
     devDependencies:
       '@biomejs/biome':
         specifier: 1.9.4
@@ -1624,6 +1627,13 @@ packages:
 
   tsconfig@7.0.0:
     resolution: {integrity: sha512-vZXmzPrL+EmC4T/4rVlT2jNVMWCi/O4DIiSj3UHg1OE5kCKbk4mfrXc6dZksLgRM/TZlKnousKH9bbTazUWRRw==}
+
+  tslib@1.14.1:
+    resolution: {integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==}
+
+  tsyringe@4.10.0:
+    resolution: {integrity: sha512-axr3IdNuVIxnaK5XGEUFTu3YmAQ6lllgrvqfEoR16g/HGnYY/6We4oWENtAnzK6/LpJ2ur9PAb80RBt7/U4ugw==}
+    engines: {node: '>= 6.0.0'}
 
   type-is@1.6.18:
     resolution: {integrity: sha512-TkRKr9sUTxEH8MdfuCSP7VizJyzRNMjj2J2do2Jr3Kym598JVdEksuzPQCnlFPW4ky9Q+iA+ma9BGm06XQBy8g==}
@@ -3365,6 +3375,12 @@ snapshots:
       '@types/strip-json-comments': 0.0.30
       strip-bom: 3.0.0
       strip-json-comments: 2.0.1
+
+  tslib@1.14.1: {}
+
+  tsyringe@4.10.0:
+    dependencies:
+      tslib: 1.14.1
 
   type-is@1.6.18:
     dependencies:
