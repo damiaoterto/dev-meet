@@ -1,6 +1,6 @@
 import 'reflect-metadata'
+import { DevMeet } from '@bootstrap/dev-meet'
 import { AppModule } from './app-module'
-import { DevMeet } from './dev-meet'
 
 async function main() {
 	const module = new AppModule()

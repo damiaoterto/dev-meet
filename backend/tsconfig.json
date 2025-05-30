@@ -17,7 +17,9 @@
     "strictPropertyInitialization": false,
     "skipLibCheck": true,
     "paths": {
+      "@application/*": ["./src/application/*"],
       "@adapters/*": ["./src/adapters/*"],
+      "@bootstrap/*": ["./src/bootstrap/*"],
       "@core/*": ["./src/core/*"],
       "@domain/*": ["./src/domain/*"],
       "@infra/*": ["./infra/*"]

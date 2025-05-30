@@ -1,6 +1,6 @@
 import { ProcessExit } from '@core/shared/enums/process-exit.enum'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
-import { DevMeet } from '../dev-meet'
+import { DevMeet } from '../bootstrap/dev-meet'
 
 const mockLog = vi.spyOn(console, 'log').mockImplementation(() => {})
 const mockError = vi.spyOn(console, 'error').mockImplementation(() => {})

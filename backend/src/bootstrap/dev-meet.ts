@@ -10,7 +10,7 @@ import type { WebSocketAdapter } from '@core/ports/web-socket-adapter'
 import type { HttpMethod } from '@core/shared/enums/http/http-methods'
 import { ProcessExit } from '@core/shared/enums/process-exit.enum'
 import type { Socket } from 'socket.io'
-import type { AppModule } from './app-module'
+import type { AppModule } from '../app-module'
 
 type ListenPorts = {
 	http?: number
@@ -25,9 +25,14 @@ interface DevMeetOptions {
 
 export class DevMeet {
 	private readonly httpAdapter: HttpAdapter
+
 	private readonly wsAdapter: WebSocketAdapter
+
 	private webRTCAdapter: WebRTCAdapter
+
 	private options?: DevMeetOptions
+
+	private appModule: AppModule
 
 	constructor(module: AppModule, options?: DevMeetOptions) {
 		this.options = options
@@ -39,12 +44,12 @@ export class DevMeet {
 			? new SocketIoAdapter(this.httpAdapter.getHttpServer())
 			: options.wsAdapter
 
-		this.listenWsEvents(module)
-		this.registerRoutes(module)
+		this.appModule = module
+		this.registerRoutes()
 	}
 
-	registerRoutes(module: AppModule) {
-		const controllers = module.getAllControllers()
+	registerRoutes() {
+		const controllers = this.appModule.getAllControllers()
 
 		for (const controller of controllers) {
 			const instance = new controller()
@@ -60,8 +65,8 @@ export class DevMeet {
 		}
 	}
 
-	private listenWsEvents(module: AppModule) {
-		const events = module.getAllEvents().map((event) => new event())
+	private listenWsEvents() {
+		const events = this.appModule.getAllEvents().map((event) => new event())
 		this.wsAdapter.onConnection(async (socket: Socket) => {
 			for (const event of events) {
 				const fn = getOnConnectionEventFn(event)
@@ -116,12 +121,13 @@ export class DevMeet {
 		const httpPort = ports?.http || 3000
 		const peerPort = ports?.peer || 9000
 
+		this.listenWsEvents()
 		this.listenPeerEvents(peerPort)
+
+		await this.httpAdapter.listen(httpPort)
 
 		console.log(`Http service listen on port ${httpPort}`)
 		console.log(`Peer service listen on port ${peerPort}`)
-
-		await this.httpAdapter.listen(httpPort)
 	}
 
 	static createApp(module: AppModule, options?: DevMeetOptions) {
