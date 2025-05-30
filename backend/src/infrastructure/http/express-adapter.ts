@@ -5,7 +5,9 @@ import { json } from 'body-parser'
 import cors from 'cors'
 import express, { type Application, type Request, type Response } from 'express'
 import helmet from 'helmet'
+import { injectable } from 'tsyringe'
 
+@injectable()
 export class ExpressAdapter implements HttpAdapter {
 	public readonly app: Application
 	public readonly server: Server

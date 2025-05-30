@@ -1,10 +1,9 @@
 import 'reflect-metadata'
 import { DevMeet } from '@bootstrap/dev-meet'
-import { AppModule } from './app-module'
+import { container } from 'tsyringe'
 
 async function main() {
-	const module = new AppModule()
-	const app = DevMeet.createApp(module)
+	const app = container.resolve(DevMeet)
 
 	app.enableGracefulShutdown()
 

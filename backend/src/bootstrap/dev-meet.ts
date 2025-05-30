@@ -1,4 +1,5 @@
 import { exit } from 'node:process'
+import container from '@bootstrap/di'
 import { getRouterInfo } from '@core/decorators/http/method.decorator'
 import { getOnConnectionEventFn } from '@core/decorators/web-socket/web-socket-events.decorator'
 import type { HttpAdapter } from '@core/ports/http-adapter'
@@ -6,10 +7,8 @@ import type { WebRTCAdapter } from '@core/ports/web-rtc-adapter'
 import type { WebSocketAdapter } from '@core/ports/web-socket-adapter'
 import type { HttpMethod } from '@core/shared/enums/http/http-methods'
 import { ProcessExit } from '@core/shared/enums/process-exit.enum'
-import { ExpressAdapter } from '@infrastructure/http/express-adapter'
-import { PeerAdapter } from '@infrastructure/web-rtc/peer-adapter'
-import { SocketIoAdapter } from '@infrastructure/ws/socket-io-adapter'
 import type { Socket } from 'socket.io'
+import { inject, injectable } from 'tsyringe'
 import type { AppModule } from '../app-module'
 
 type ListenPorts = {
@@ -17,34 +16,21 @@ type ListenPorts = {
 	peer?: number
 }
 
-interface DevMeetOptions {
-	httpAdapter?: HttpAdapter
-	wsAdapter?: WebSocketAdapter
-	webRTCAdapter?: WebRTCAdapter
-}
-
+@injectable()
 export class DevMeet {
-	private readonly httpAdapter: HttpAdapter
+	constructor(
+		@inject('AppModule')
+		private readonly appModule: AppModule,
 
-	private readonly wsAdapter: WebSocketAdapter
+		@inject('HttpAdapter')
+		private readonly httpAdapter: HttpAdapter,
 
-	private webRTCAdapter: WebRTCAdapter
+		@inject('WebSocketAdapter')
+		private readonly wsAdapter: WebSocketAdapter,
 
-	private options?: DevMeetOptions
-
-	private appModule: AppModule
-
-	constructor(module: AppModule, options?: DevMeetOptions) {
-		this.options = options
-		this.httpAdapter = !options?.httpAdapter
-			? new ExpressAdapter()
-			: options?.httpAdapter
-
-		this.wsAdapter = !options?.wsAdapter
-			? new SocketIoAdapter(this.httpAdapter.getHttpServer())
-			: options.wsAdapter
-
-		this.appModule = module
+		@inject('WebRTCAdapter')
+		private readonly webRTCAdapter: WebRTCAdapter,
+	) {
 		this.registerRoutes()
 	}
 
@@ -77,10 +63,6 @@ export class DevMeet {
 	}
 
 	private listenPeerEvents(port: number, path = '/peer') {
-		if (!this.options?.webRTCAdapter) {
-			this.webRTCAdapter = new PeerAdapter(port, path)
-		}
-
 		this.webRTCAdapter.onConnection(async (client) => {
 			// TODO: peer events handler implementation here
 		})
@@ -121,6 +103,8 @@ export class DevMeet {
 		const httpPort = ports?.http || 3000
 		const peerPort = ports?.peer || 9000
 
+		this.webRTCAdapter.createPeerServer(peerPort, '/peer')
+
 		this.listenWsEvents()
 		this.listenPeerEvents(peerPort)
 
@@ -130,7 +114,7 @@ export class DevMeet {
 		console.log(`Peer service listen on port ${peerPort}`)
 	}
 
-	static createApp(module: AppModule, options?: DevMeetOptions) {
-		return new DevMeet(module, options)
+	static createApp() {
+		return container.resolve(DevMeet)
 	}
 }

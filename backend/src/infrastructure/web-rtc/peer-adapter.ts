@@ -3,12 +3,15 @@ import type {
 	WebRTCAdapter,
 } from '@core/ports/web-rtc-adapter'
 import { type IClient, PeerServer, type PeerServerEvents } from 'peer'
+import { injectable } from 'tsyringe'
 
-export class PeerAdapter implements WebRTCAdapter {
-	private readonly peer: PeerServerEvents
+@injectable()
+export class PeerAdapter implements WebRTCAdapter<PeerServerEvents> {
+	private peer: PeerServerEvents
 
-	constructor(port: number, path: string) {
-		this.peer = PeerServer({ port, path, allow_discovery: true })
+	createPeerServer(port: number, path: string): PeerServerEvents {
+		this.peer = PeerServer({ port, path })
+		return this.peer
 	}
 
 	onError(cb: P2PConnectionCallback<Error>): void {

@@ -1,15 +1,20 @@
 import type { Server as HttpServer } from 'node:http'
+import type { HttpAdapter } from '@core/ports/http-adapter'
 import type {
 	WebSocketAdapter,
 	WsConnectionCallback,
 } from '@core/ports/web-socket-adapter'
 import { Server as IoServer, type Socket } from 'socket.io'
+import { inject, injectable } from 'tsyringe'
 
+@injectable()
 export class SocketIoAdapter implements WebSocketAdapter {
 	public readonly io: IoServer
 
-	constructor(server: HttpServer) {
-		this.io = new IoServer(server)
+	constructor(
+		@inject('HttpAdapter') private readonly httpAdapter: HttpAdapter,
+	) {
+		this.io = new IoServer(this.httpAdapter.getHttpServer())
 	}
 
 	onConnection(cb: WsConnectionCallback<Socket>): void {
