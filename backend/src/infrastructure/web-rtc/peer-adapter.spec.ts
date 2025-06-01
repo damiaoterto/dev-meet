@@ -1,35 +1,30 @@
+import { randomUUID } from 'node:crypto'
+import type { WebRTCAdapter } from '@core/ports/web-rtc-adapter'
+import { IClient, PeerServer, type PeerServerEvents } from 'peer'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { PeerAdapter } from './peer-adapter'
 
-type MockPeer = {
-	on: (event: string, cb: (...args: unknown[]) => void) => void
-}
-
-const createMockSocket = (): MockPeer => ({
-	on: vi.fn(),
-})
-
-const createMockPeerServer = () => {
-	const mockOn = vi.fn()
-	const mockListen = vi.fn()
-
-	return {
-		on: mockOn,
-		listen: mockListen,
-	}
-}
-
-const mockPeerServer = createMockPeerServer()
-
 vi.mock('peer', () => ({
-	PeerServer: vi.fn(() => mockPeerServer),
+	PeerServer: vi.fn().mockImplementation(() => {
+		return {
+			on: vi.fn(),
+		}
+	}),
 }))
 
+const mockedPeerServer = vi.mocked(PeerServer)
+
 describe('PeerAdapter', () => {
-	let adapter: PeerAdapter
+	let adapter: WebRTCAdapter<PeerServerEvents>
+	let server: PeerServerEvents
+	let mockPeerInstance: { on: ReturnType<typeof vi.fn> }
 
 	beforeEach(() => {
 		adapter = new PeerAdapter()
+
+		mockPeerInstance = { on: vi.fn() }
+		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+		mockedPeerServer.mockReturnValue(mockPeerInstance as any)
 	})
 
 	afterEach(() => {
@@ -40,41 +35,63 @@ describe('PeerAdapter', () => {
 		expect(adapter).toBeDefined()
 	})
 
-	it('should call the connection callback when a connection event occurs', async () => {
-		const mockPeer = createMockSocket()
-		const connectionCallback = vi.fn()
+	it('should create a peer server with correct path and port', () => {
+		const port = 9090
+		const path = '/p2p-path'
 
-		adapter.onConnection(connectionCallback)
+		const peer = adapter.createPeerServer(port, path)
 
-		const connectionHandler = mockPeerServer.on.mock.calls.find(
-			(call) => call[0] === 'connection',
-		)?.[1]
+		expect(mockedPeerServer).toBeCalledTimes(1)
+		expect(mockedPeerServer).toHaveBeenCalledWith({ port, path })
 
-		if (connectionHandler) {
-			await connectionHandler(mockPeer)
-		} else {
-			throw new Error('Connection handler not registered')
-		}
-
-		expect(connectionCallback).toHaveBeenCalledWith(mockPeer)
+		expect(peer).toBe(mockPeerInstance)
 	})
 
-	it('should call the open callback when a connection event occurs', async () => {
-		const mockPeer = createMockSocket()
-		const connectionCallback = vi.fn()
+	it('should register a callback for "error" event and trigger it', () => {
+		const errorCallback = vi.fn()
+		const testError = new Error('Error on connection')
 
-		adapter.onError(connectionCallback)
+		adapter.createPeerServer(9090, '/peer')
+		adapter.onError(errorCallback)
 
-		const connectionHandler = mockPeerServer.on.mock.calls.find(
+		expect(mockPeerInstance.on).toHaveBeenCalledWith(
+			'error',
+			expect.any(Function),
+		)
+
+		const errorListener = mockPeerInstance.on.mock.calls.find(
 			(call) => call[0] === 'error',
 		)?.[1]
 
-		if (connectionHandler) {
-			await connectionHandler(mockPeer)
-		} else {
-			throw new Error('Connection handler not registered')
+		expect(errorListener).toBeDefined()
+		errorListener(testError)
+
+		expect(errorCallback).toHaveBeenCalledTimes(1)
+		expect(errorCallback).toHaveBeenCalledWith(testError)
+	})
+
+	it('should register a callback for "connection" event and trigger it', () => {
+		const connectionCallback = vi.fn().mockResolvedValue(undefined)
+		const mockClient = {
+			getId: vi.fn().mockReturnValue(randomUUID().toString()),
 		}
 
-		expect(connectionCallback).toHaveBeenCalledWith(mockPeer)
+		adapter.createPeerServer(9090, '/peer')
+		adapter.onConnection(connectionCallback)
+
+		expect(mockPeerInstance.on).toHaveBeenCalledWith(
+			'connection',
+			expect.any(Function),
+		)
+
+		const connectionListener = mockPeerInstance.on.mock.calls.find(
+			(call) => call[0] === 'connection',
+		)?.[1]
+
+		expect(connectionListener).toBeDefined()
+		connectionListener(mockClient)
+
+		expect(connectionCallback).toBeCalledTimes(1)
+		expect(connectionCallback).toHaveBeenCalledWith(mockClient)
 	})
 })

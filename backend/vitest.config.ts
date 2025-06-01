@@ -4,8 +4,11 @@ import { defineConfig } from 'vitest/config'
 export default defineConfig({
 	test: {
 		alias: {
+			'@application': resolve(__dirname, 'src', 'application'),
 			'@adapters': resolve(__dirname, 'src', 'adapters'),
+			'@bootstrap': resolve(__dirname, 'src', 'bootstrap'),
 			'@core': resolve(__dirname, 'src', 'core'),
+			'@infrastructure': resolve(__dirname, 'src', 'infrastructure'),
 		},
 		coverage: {
 			provider: 'v8',

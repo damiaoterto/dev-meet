@@ -1,62 +1,69 @@
-import type { Server } from 'node:http'
+import type { Server as HttpServer } from 'node:http'
+import type { HttpAdapter } from '@core/ports/http-adapter'
+import type { Server as IoServerType, Socket } from 'socket.io'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { SocketIoAdapter } from './socket-io-adapter'
 
-type MockSocket = {
-	on: (event: string, cb: (...args: unknown[]) => void) => void
-	emit: (event: string, ...args: unknown[]) => void
-}
-
-const createMockSocket = (): MockSocket => ({
-	on: vi.fn(),
-	emit: vi.fn(),
-})
-
-const createMockIoServer = () => {
-	const mockOn = vi.fn()
-	const mockClose = vi.fn()
-
-	return {
-		on: mockOn,
-		disconnectSockets: mockClose,
-	}
-}
-
-const mockIoServer = createMockIoServer()
-
 vi.mock('socket.io', () => ({
-	Server: vi.fn(() => mockIoServer),
+	Server: vi.fn().mockImplementation(() => {
+		return {
+			on: vi.fn(),
+			disconnectSockets: vi.fn((_close) => Promise.resolve()), // Mock disconnectSockets to return a resolved promise
+		}
+	}),
 }))
 
-describe('SocketIO Adapter', () => {
-	let mockHttpServer: Server
+describe('SocketIO Adapter', async () => {
+	let mockHttpAdapter: HttpAdapter
+	let mockNodeHttpServer: HttpServer
 	let adapter: SocketIoAdapter
+	let mockIoServerInstance: IoServerType
+
+	const MockIoServer = vi.mocked((await import('socket.io')).Server, true)
 
 	beforeEach(() => {
-		mockHttpServer = {} as Server
-		adapter = new SocketIoAdapter(mockHttpServer)
+		mockNodeHttpServer = {} as HttpServer // Minimal mock for Node's HttpServer
+		mockHttpAdapter = {
+			getHttpServer: vi.fn(() => mockNodeHttpServer),
+			listen: vi.fn(),
+			close: vi.fn(),
+			getInstance: vi.fn(),
+		} as unknown as HttpAdapter // Cast to HttpAdapter, mocking only used methods
+
+		adapter = new SocketIoAdapter(mockHttpAdapter)
+		// The instance created by `new Server()` in the constructor
+		mockIoServerInstance = MockIoServer.mock.results[0].value
 	})
 
 	afterEach(() => {
 		vi.clearAllMocks()
+		MockIoServer.mockClear()
 	})
 
 	it('should be defined', () => {
 		expect(adapter).toBeDefined()
 	})
 
+	it('should create a socket.io server with the http server from HttpAdapter', () => {
+		expect(mockHttpAdapter.getHttpServer).toHaveBeenCalledTimes(1)
+		expect(MockIoServer).toHaveBeenCalledWith(mockNodeHttpServer)
+		expect(adapter.io).toBeDefined()
+		expect(adapter.io).toBe(mockIoServerInstance)
+	})
+
 	it('should call the connection callback when a connection event occurs', async () => {
-		const mockSocket = createMockSocket()
+		const mockSocket = { id: 'test-socket' } as Socket // Minimal mock for Socket
 		const connectionCallback = vi.fn()
 
 		adapter.onConnection(connectionCallback)
 
-		const connectionHandler = mockIoServer.on.mock.calls.find(
-			(call) => call[0] === 'connection',
-		)?.[1]
+		// Simulate a connection event
+		const connectionHandler = vi
+			.mocked(mockIoServerInstance.on)
+			.mock.calls.find((call) => call[0] === 'connection')?.[1]
 
 		if (connectionHandler) {
-			await connectionHandler(mockSocket)
+			await connectionHandler(mockSocket) // Pass the mock socket to the handler
 		} else {
 			throw new Error('Connection handler not registered')
 		}
@@ -66,6 +73,8 @@ describe('SocketIO Adapter', () => {
 
 	it('should close the socket.io server without errors', async () => {
 		await expect(adapter.close()).resolves.not.toThrow()
-		expect(mockIoServer.disconnectSockets).toHaveBeenCalled()
+		expect(
+			vi.mocked(mockIoServerInstance.disconnectSockets),
+		).toHaveBeenCalledWith(true)
 	})
 })
