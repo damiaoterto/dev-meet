@@ -19,8 +19,7 @@ export class WebSocketModuleSetup {
 		this.webSocketAdapter.onConnection(async (socket: Socket) => {
 			for (const event of events) {
 				const fn = getOnConnectionEventFn(event)
-				if (!fn) continue
-				await fn(socket)
+				if (fn) await fn(socket)
 			}
 		})
 	}
