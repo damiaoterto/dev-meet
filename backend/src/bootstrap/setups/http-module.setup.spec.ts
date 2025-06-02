@@ -9,7 +9,7 @@ import {
 	it,
 	vi,
 } from 'vitest'
-import type { AppModule } from '../app-module'
+import type { AppModule } from '../../app-module'
 import { HttpModuleSetup } from './http-module.setup'
 
 const mockAppModule = {

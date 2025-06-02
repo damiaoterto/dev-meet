@@ -10,7 +10,7 @@ import {
 	it,
 	vi,
 } from 'vitest'
-import type { AppModule } from '../app-module'
+import type { AppModule } from '../../app-module'
 import { WebSocketModuleSetup } from './websocket-module.setup'
 
 vi.mock('socket.io', () => ({

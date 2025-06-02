@@ -8,8 +8,8 @@ import { ProcessExit } from '@core/shared/enums/process-exit.enum'
 import type { Socket } from 'socket.io'
 import { inject, injectable } from 'tsyringe'
 import type { AppModule } from '../app-module'
-import type { HttpModuleSetup } from './http-module.setup'
-import type { WebSocketModuleSetup } from './websocket-module.setup'
+import type { HttpModuleSetup } from './setups/http-module.setup'
+import type { WebSocketModuleSetup } from './setups/websocket-module.setup'
 
 type ListenPorts = {
 	http?: number

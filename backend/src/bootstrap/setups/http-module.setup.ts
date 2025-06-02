@@ -2,7 +2,7 @@ import { getRouterInfo } from '@core/decorators/http/method.decorator'
 import type { HttpAdapter } from '@core/ports/http-adapter'
 import type { HttpMethod } from '@core/shared/enums/http/http-methods'
 import { inject, injectable } from 'tsyringe'
-import type { AppModule } from '../app-module'
+import type { AppModule } from '../../app-module'
 
 @injectable()
 export class HttpModuleSetup {
