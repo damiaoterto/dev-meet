@@ -51,6 +51,7 @@ describe('HttpModuleSetup', () => {
 		])
 
 		httpModuleSetup.execute()
+
 		expect(getRouterInfo).toBeCalledTimes(1)
 		expect(mockHttpAdapter.registerRouter).toBeCalledTimes(1)
 	})
