@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import type { WebRTCAdapter } from '@core/ports/web-rtc-adapter'
-import { IClient, PeerServer, type PeerServerEvents } from 'peer'
+import { PeerServer, type PeerServerEvents } from 'peer'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { PeerAdapter } from './peer-adapter'
 

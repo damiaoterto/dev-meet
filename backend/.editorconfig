@@ -10,3 +10,4 @@ insert_final_newline = true
 
 [*.{js,ts}]
 indent_style = tab
+indent_size = 2

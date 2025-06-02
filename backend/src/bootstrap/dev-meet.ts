@@ -10,6 +10,7 @@ import { ProcessExit } from '@core/shared/enums/process-exit.enum'
 import type { Socket } from 'socket.io'
 import { inject, injectable } from 'tsyringe'
 import type { AppModule } from '../app-module'
+import type { HttpModuleSetup } from './http-module.setup'
 
 type ListenPorts = {
 	http?: number
@@ -30,25 +31,15 @@ export class DevMeet {
 
 		@inject('WebRTCAdapter')
 		private readonly webRTCAdapter: WebRTCAdapter,
+
+		@inject('HttpModuleSetup')
+		private readonly httpModuleSetup: HttpModuleSetup,
 	) {
-		this.registerRoutes()
+		this.bootstrap()
 	}
 
-	registerRoutes() {
-		const controllers = this.appModule.getAllControllers()
-
-		for (const controller of controllers) {
-			const instance = new controller()
-			const routes = getRouterInfo(instance)
-
-			for (const route of routes) {
-				this.httpAdapter.registerRouter(
-					route.method as HttpMethod,
-					route.path,
-					route.handler,
-				)
-			}
-		}
+	private bootstrap() {
+		this.httpModuleSetup.execute()
 	}
 
 	private listenWsEvents() {
