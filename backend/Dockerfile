@@ -14,6 +14,9 @@ RUN pnpm run build
 
 FROM node:22-alpine
 
+ARG NODE_ENV=production
+ENV NODE_ENV=${NODE_ENV}
+
 WORKDIR /usr/share/app
 
 COPY --from=builder /usr/share/app/dist ./dist

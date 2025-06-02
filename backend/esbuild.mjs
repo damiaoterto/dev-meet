@@ -8,7 +8,7 @@ async function build() {
 		outdir: './dist',
 		bundle: true,
 		minify: true,
-		sourcemap: 'inline',
+		sourcemap: 'linked',
 		platform: 'node',
 		target: 'node16',
 		format: 'cjs',
