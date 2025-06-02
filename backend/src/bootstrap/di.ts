@@ -6,6 +6,7 @@ import { SocketIoAdapter } from '@infrastructure/ws/socket-io-adapter'
 import { container } from 'tsyringe'
 import { AppModule } from '../app-module'
 import { HttpModuleSetup } from './http-module.setup'
+import { WebSocketModuleSetup } from './websocket-module.setup'
 
 container.register<AppModule>('AppModule', AppModule)
 container.registerSingleton<HttpAdapter>('HttpAdapter', ExpressAdapter)
@@ -15,5 +16,6 @@ container.registerSingleton<WebSocketAdapter>(
 )
 container.registerSingleton('WebRTCAdapter', PeerAdapter)
 container.registerSingleton('HttpModuleSetup', HttpModuleSetup)
+container.registerSingleton('WebSocketModuleSetup', WebSocketModuleSetup)
 
 export default container

@@ -9,6 +9,7 @@ import type { Socket } from 'socket.io'
 import { inject, injectable } from 'tsyringe'
 import type { AppModule } from '../app-module'
 import type { HttpModuleSetup } from './http-module.setup'
+import type { WebSocketModuleSetup } from './websocket-module.setup'
 
 type ListenPorts = {
 	http?: number
@@ -32,23 +33,16 @@ export class DevMeet {
 
 		@inject('HttpModuleSetup')
 		private readonly httpModuleSetup: HttpModuleSetup,
+
+		@inject('WebSocketModuleSetup')
+		private readonly webSocketModuleSetup: WebSocketModuleSetup,
 	) {
 		this.bootstrap()
 	}
 
 	private bootstrap() {
 		this.httpModuleSetup.execute()
-	}
-
-	private listenWsEvents() {
-		const events = this.appModule.getAllEvents().map((event) => new event())
-		this.wsAdapter.onConnection(async (socket: Socket) => {
-			for (const event of events) {
-				const fn = getOnConnectionEventFn(event)
-				if (!fn) continue
-				await fn(socket)
-			}
-		})
+		this.webSocketModuleSetup.execute()
 	}
 
 	private listenPeerEvents(port: number, path = '/peer') {
@@ -94,7 +88,6 @@ export class DevMeet {
 
 		this.webRTCAdapter.createPeerServer(peerPort, '/peer')
 
-		this.listenWsEvents()
 		this.listenPeerEvents(peerPort)
 
 		await this.httpAdapter.listen(httpPort)
