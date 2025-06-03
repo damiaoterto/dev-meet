@@ -1,5 +1,5 @@
 import { resolve } from 'node:path'
-import { defineConfig } from 'vitest/config'
+import { defaultExclude, defineConfig } from 'vitest/config'
 
 export default defineConfig({
 	test: {
@@ -12,6 +12,18 @@ export default defineConfig({
 		coverage: {
 			provider: 'v8',
 			reporter: ['text', 'lcov', 'html', 'json'],
+			exclude: [
+				...defaultExclude,
+				'**/enums/*.enum.ts',
+				'**/app-module.ts',
+				'**/bootstrap/di.ts',
+				'**/main.ts',
+				'**/esbuild.mjs',
+				'**/dev-meet.ts',
+				'**/interfaces/*',
+				'**/ports/*',
+				'**/types/*',
+			],
 		},
 		setupFiles: ['./test/setups/reflect-metadata.ts'],
 	},
